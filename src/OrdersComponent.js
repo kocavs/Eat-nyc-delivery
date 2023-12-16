@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import apigClient from './apigClient'
 
-function OrdersComponent() {
+function OrdersComponent({ userInfo }) {
   const [orders, setOrders] = useState([]);
   const [intervalIds, setIntervalIds] = useState({});
+  const [isAvailableForDelivery, setIsAvailableForDelivery] = useState(false);
+  const deliveryPersonnelId = "dhiren7motwani@gmail.com"; // Example email
+  const pincode = '75057'; // Hardcoded pincode
+
 
   useEffect(() => {
-    // Call showOrders function when the component mounts
-    showOrders();
-
     // Clean up any intervals and remove them from the state when the component unmounts
     return () => {
       Object.values(intervalIds).forEach((intervalId) => clearInterval(intervalId));
@@ -16,31 +17,46 @@ function OrdersComponent() {
 
   }, []);
 
-  function showOrders() {
-    const params = {
-      user_id:'example@gmail.com'
+  const makeAvailableForDelivery = () => {
+    // Prepare the request body
+    const body = {
+        "deliveryPersonnelId": deliveryPersonnelId,
+        "pincode": pincode
     };
-    const body = {};
 
-    // Call the API Gateway endpoint to get orders ready to deliver
-    apigClient.ordersGet(params, body,{})
+    // Call availableForDelivery API with the body
+    apigClient.availableforDeliveryPost({}, body, {})
       .then(response => {
-        console.log(response)
+        console.log('Available for delivery:', response.data);
+        setIsAvailableForDelivery(true);
+      })
+      .catch(error => console.error('Error making available for delivery:', error));
+  };
+
+  const showAvailableOrders = () => {
+    const params = { "user_id": deliveryPersonnelId };
+    apigClient.ordersGet(params, {})
+      .then(response => {
+        console.log(response.data);
         displayOrders(response.data);
       })
-      .catch(error => {
-        console.error('Error fetching orders:', error);
-      });
-  }
-
-  function displayOrders(ordersData) {
-    if (Array.isArray(ordersData) && ordersData.length > 0) {
-      setOrders(ordersData);
-    } else {
-      // Handle empty or invalid ordersData
-      setOrders([]); // Clear any existing orders
+      .catch(error => console.error('Error fetching orders:', error));
+  };
+  
+  const displayOrders = (ordersData) => {
+    try {
+      // First parse the outer array
+      const outerArray = JSON.parse(ordersData.body);
+  
+      // Now parse each order string in the outer array
+      const parsedOrders = outerArray.map(orderString => JSON.parse(orderString));
+  
+      setOrders(parsedOrders);
+    } catch (error) {
+      console.error('Error parsing orders:', error);
+      setOrders([]); // Reset orders on error
     }
-  }
+  };
 
   function startDelivery(orderId) {
     const intervalId = setInterval(function () {
@@ -75,43 +91,49 @@ function OrdersComponent() {
       });
   }
 
-  function completeDelivery(orderId) {
-    // Stop tracking location for the specific orderId
+  const completeDelivery = (orderId) => {
     clearInterval(intervalIds[orderId]);
 
-    // Call API Gateway to update that the order is delivered
     const params = {};
-    const body = { orderId: orderId };
+    const body = { orderId };
 
-    // Call API Gateway endpoint to mark delivery as complete
     apigClient.completeDeliveryPost(params, body)
-      .then(function (result) {
-        console.log('Delivery completed:', result.data);
+      .then(response => {
+        console.log('Delivery completed:', response.data);
+        // Optionally, update orders state to reflect delivery completion
       })
-      .catch(function (err) {
-        console.error('Error completing delivery:', err);
-      });
-  }
+      .catch(error => console.error('Error completing delivery:', error));
+  };
 
-  return (
+
+
+ return (
     <div>
-      {orders.length > 0 ? (
-        <ul>
-          {orders.map((order) => (
-            <li key={order.order_id}>
-              <p>Order ID: {order.order_id}</p>
-              <p>Details: {order.details}</p>
-              <button onClick={() => startDelivery(order.order_id)}>
-                Start Delivery
-              </button>
-              <button onClick={() => completeDelivery(order.order_id)}>
-                Complete Delivery
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No orders available.</p>
+      {!isAvailableForDelivery && (
+        <button onClick={makeAvailableForDelivery}>Make Available for Delivery</button>
+      )}
+      {isAvailableForDelivery && (
+        <>
+          <button onClick={showAvailableOrders}>Show Available Orders</button>
+          {orders.length > 0 ? (
+            <ul>
+              {orders.map((order) => (
+                <li key={order.order_id}>
+                  <p>Order ID: {order.order_id}</p>
+                  {/* ... other order details ... */}
+                  <button onClick={() => startDelivery(order.order_id)}>
+                    Start Delivery
+                  </button>
+                  <button onClick={() => completeDelivery(order.order_id)}>
+                    Complete Delivery
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No orders available.</p>
+          )}
+        </>
       )}
     </div>
   );

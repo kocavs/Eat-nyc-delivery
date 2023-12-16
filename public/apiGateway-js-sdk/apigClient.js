@@ -53,7 +53,7 @@ apigClientFactory.newClient = function (config) {
 
     
     // extract endpoint and path from url
-    var invokeUrl = 'https://cvbtn70ohg.execute-api.us-east-1.amazonaws.com/v1';
+    var invokeUrl = 'https://paxpnjkm5e.execute-api.us-east-1.amazonaws.com/v1';
     var endpoint = /(^https?:\/\/[^\/]+)/g.exec(invokeUrl)[1];
     var pathComponent = invokeUrl.substring(endpoint.length);
 
@@ -204,7 +204,7 @@ apigClientFactory.newClient = function (config) {
             body: body
         };
         
-        console.log(ordersGetRequest)
+        
         return apiGatewayClient.makeRequest(ordersGetRequest, authType, additionalParams, config.apiKey);
     };
     
