@@ -194,13 +194,13 @@ apigClientFactory.newClient = function (config) {
     apigClient.ordersGet = function (params, body, additionalParams) {
         if(additionalParams === undefined) { additionalParams = {}; }
         
-        apiGateway.core.utils.assertParametersDefined(params, [], ['body']);
+        apiGateway.core.utils.assertParametersDefined(params, ['user_id'], ['body']);
         
         var ordersGetRequest = {
             verb: 'get'.toUpperCase(),
             path: pathComponent + uritemplate('/orders').expand(apiGateway.core.utils.parseParametersToObject(params, [])),
             headers: apiGateway.core.utils.parseParametersToObject(params, []),
-            queryParams: apiGateway.core.utils.parseParametersToObject(params, []),
+            queryParams: apiGateway.core.utils.parseParametersToObject(params, ['user_id']),
             body: body
         };
         
