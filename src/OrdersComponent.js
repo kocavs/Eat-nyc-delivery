@@ -49,8 +49,8 @@ function OrdersComponent({ userInfo }) {
       const outerArray = JSON.parse(ordersData.body);
   
       // Now parse each order string in the outer array
-      const parsedOrders = outerArray.map(orderString => JSON.parse(orderString));
-  
+      let parsedOrders = outerArray.map(orderString => JSON.parse(orderString));
+      parsedOrders = parsedOrders.flat();
       setOrders(parsedOrders);
     } catch (error) {
       console.error('Error parsing orders:', error);
@@ -79,10 +79,10 @@ function OrdersComponent({ userInfo }) {
 
   function sendLocation(orderId, location) {
     const params = {};
-    const body = { orderId: orderId, location: location };
+    const body = { "order_id": orderId, "location": location };
 
     // Call API Gateway endpoint to send the location
-    apigClient.locationPost(params, body)
+    apigClient.locationPut(params, body, {})
       .then(function (result) {
         console.log('Location sent successfully:', result.data);
       })
@@ -120,7 +120,6 @@ function OrdersComponent({ userInfo }) {
               {orders.map((order) => (
                 <li key={order.order_id}>
                   <p>Order ID: {order.order_id}</p>
-                  {/* ... other order details ... */}
                   <button onClick={() => startDelivery(order.order_id)}>
                     Start Delivery
                   </button>
