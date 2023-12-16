@@ -53,7 +53,7 @@ apigClientFactory.newClient = function (config) {
 
     
     // extract endpoint and path from url
-    var invokeUrl = 'https://cvbtn70ohg.execute-api.us-east-1.amazonaws.com/v1';
+    var invokeUrl = 'https://paxpnjkm5e.execute-api.us-east-1.amazonaws.com/v1';
     var endpoint = /(^https?:\/\/[^\/]+)/g.exec(invokeUrl)[1];
     var pathComponent = invokeUrl.substring(endpoint.length);
 
@@ -194,17 +194,17 @@ apigClientFactory.newClient = function (config) {
     apigClient.ordersGet = function (params, body, additionalParams) {
         if(additionalParams === undefined) { additionalParams = {}; }
         
-        apiGateway.core.utils.assertParametersDefined(params, ['user_id'], ['body']);
+        apiGateway.core.utils.assertParametersDefined(params, [], ['body']);
         
         var ordersGetRequest = {
             verb: 'get'.toUpperCase(),
             path: pathComponent + uritemplate('/orders').expand(apiGateway.core.utils.parseParametersToObject(params, [])),
             headers: apiGateway.core.utils.parseParametersToObject(params, []),
-            queryParams: apiGateway.core.utils.parseParametersToObject(params, ['user_id']),
+            queryParams: apiGateway.core.utils.parseParametersToObject(params, []),
             body: body
         };
         
-        console.log(ordersGetRequest)
+        
         return apiGatewayClient.makeRequest(ordersGetRequest, authType, additionalParams, config.apiKey);
     };
     
