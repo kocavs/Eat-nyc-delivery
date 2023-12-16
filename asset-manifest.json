@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/eat-nyc-delivery/static/css/main.e7590770.css",
-    "main.js": "/eat-nyc-delivery/static/js/main.f848d77a.js",
+    "main.js": "/eat-nyc-delivery/static/js/main.53ef7d3b.js",
     "index.html": "/eat-nyc-delivery/index.html",
     "main.e7590770.css.map": "/eat-nyc-delivery/static/css/main.e7590770.css.map",
-    "main.f848d77a.js.map": "/eat-nyc-delivery/static/js/main.f848d77a.js.map"
+    "main.53ef7d3b.js.map": "/eat-nyc-delivery/static/js/main.53ef7d3b.js.map"
   },
   "entrypoints": [
     "static/css/main.e7590770.css",
-    "static/js/main.f848d77a.js"
+    "static/js/main.53ef7d3b.js"
   ]
 }
