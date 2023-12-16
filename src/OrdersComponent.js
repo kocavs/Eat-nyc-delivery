@@ -79,7 +79,7 @@ function OrdersComponent({ userInfo }) {
 
   function sendLocation(orderId, location) {
     const params = {};
-    const body = { "order_id": orderId, "location": location };
+    const body = { "order_id": String(orderId), "location": location };
 
     // Call API Gateway endpoint to send the location
     apigClient.locationPut(params, body, {})
@@ -95,9 +95,9 @@ function OrdersComponent({ userInfo }) {
     clearInterval(intervalIds[orderId]);
 
     const params = {};
-    const body = { orderId };
+    const body = { "order_id": String(orderId) };
 
-    apigClient.completeDeliveryPost(params, body)
+    apigClient.completeDeliveryPut(params, body)
       .then(response => {
         console.log('Delivery completed:', response.data);
         // Optionally, update orders state to reflect delivery completion
