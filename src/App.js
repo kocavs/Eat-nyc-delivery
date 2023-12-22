@@ -59,22 +59,21 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Welcome to Your Delivery App</h1>
-        {isAuthenticated ? (
-          <div>
-            <p>Logged in as: {userInfo?.email}</p>
-            <button onClick={handleLogout}>Logout</button>
-            <main>
-              <OrdersComponent userInfo={userInfo} />
-            </main>
-          </div>
-        ) : (
-          <div>
-            <p>You are not logged in</p>
-            <button onClick={redirectToLogin}>Login</button>
-          </div>
-        )}
       </header>
-
+      {isAuthenticated ? (
+        <div className="user-info">
+          <p className="user-email">Logged in as: {userInfo?.email}</p>
+          <button className="button" onClick={handleLogout}>Logout</button>
+          <main>
+            <OrdersComponent userInfo={userInfo} />
+          </main>
+        </div>
+      ) : (
+        <div className="user-info">
+          <p className="user-email">You are not logged in</p>
+          <button className="button" onClick={redirectToLogin}>Login</button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apigClient from './apigClient'
+import './OrdersComponent.css'
 
 function OrdersComponent({ userInfo }) {
   const [orders, setOrders] = useState([]);
@@ -59,24 +60,39 @@ function OrdersComponent({ userInfo }) {
   };
 
   function startDelivery(orderId) {
-    const intervalId = setInterval(function () {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        const location = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        };
+    // Call startOrderDeliveryPut API first
+    const startOrderBody = {
+      "order_id": String(orderId),
+      "delivery_person_id": deliveryPersonnelId
+    }; 
 
-        sendLocation(orderId, location);
+    apigClient.startOrderDeliveryPut({}, startOrderBody, {})
+      .then(response => {
+        console.log('Order delivery started:', response.data);
+        
+        // Start sending location updates
+        const intervalId = setInterval(function () {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            const location = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            };
+  
+            sendLocation(orderId, location);
+          });
+        }, 15000);
+  
+        // Store the intervalId in state with orderId as the key
+        setIntervalIds(prevIntervalIds => ({
+          ...prevIntervalIds,
+          [orderId]: intervalId,
+        }));
+      })
+      .catch(error => {
+        console.error('Error starting order delivery:', error);
       });
-    }, 15000);
-
-    // Store the intervalId in state with orderId as the key
-    setIntervalIds((prevIntervalIds) => ({
-      ...prevIntervalIds,
-      [orderId]: intervalId,
-    }));
   }
-
+  
   function sendLocation(orderId, location) {
     const params = {};
     const body = { "order_id": String(orderId), "location": location };
@@ -108,33 +124,37 @@ function OrdersComponent({ userInfo }) {
 
 
  return (
-    <div>
-      {!isAvailableForDelivery && (
-        <button onClick={makeAvailableForDelivery}>Make Available for Delivery</button>
-      )}
-      {isAvailableForDelivery && (
-        <>
-          <button onClick={showAvailableOrders}>Show Available Orders</button>
-          {orders.length > 0 ? (
-            <ul>
-              {orders.map((order) => (
-                <li key={order.order_id}>
-                  <p>Order ID: {order.order_id}</p>
-                  <button onClick={() => startDelivery(order.order_id)}>
-                    Start Delivery
-                  </button>
-                  <button onClick={() => completeDelivery(order.order_id)}>
-                    Complete Delivery
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No orders available.</p>
-          )}
-        </>
-      )}
-    </div>
+  <div className="delivery-container">
+    {!isAvailableForDelivery && (
+      <button className="delivery-button" onClick={makeAvailableForDelivery}>
+        Make Available for Delivery
+      </button>
+    )}
+    {isAvailableForDelivery && (
+      <>
+        <button className="delivery-button" onClick={showAvailableOrders}>
+          Show Available Orders
+        </button>
+        {orders.length > 0 ? (
+          <ul className="order-list">
+            {orders.map((order) => (
+              <li key={order.order_id} className="order-item">
+                <p className="order-detail">Order ID: {order.order_id}</p>
+                <button className="delivery-button" onClick={() => startDelivery(order.order_id)}>
+                  Start Delivery
+                </button>
+                <button className="delivery-button" onClick={() => completeDelivery(order.order_id)}>
+                  Complete Delivery
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No orders available.</p>
+        )}
+      </>
+    )}
+  </div>
   );
 }
 
