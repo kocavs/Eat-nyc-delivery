@@ -50,7 +50,7 @@ function OrdersComponent({ userInfo }) {
       const outerArray = JSON.parse(ordersData.body);
   
       // Now parse each order string in the outer array
-      let parsedOrders = outerArray.map(orderString => JSON.parse(orderString));
+      let parsedOrders = outerArray.map(orderString => JSON.parse(orderString.body));
       parsedOrders = parsedOrders.flat();
       setOrders(parsedOrders);
     } catch (error) {
